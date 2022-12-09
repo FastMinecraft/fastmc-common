@@ -1,4 +1,4 @@
-package dev.fastmc.common.collection.collection
+package dev.fastmc.common.collection
 
 import it.unimi.dsi.fastutil.ints.AbstractInt2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap

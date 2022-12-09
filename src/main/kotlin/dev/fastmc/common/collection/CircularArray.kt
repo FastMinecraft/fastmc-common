@@ -1,4 +1,4 @@
-package dev.fastmc.common.collection.collection
+package dev.fastmc.common.collection
 
 class CircularArray<E> private constructor(private val array: Array<Any?>, filled: Boolean) : MutableList<E> {
     constructor(size: Int) : this(arrayOfNulls(size), false)

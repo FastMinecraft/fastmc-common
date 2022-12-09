@@ -257,7 +257,7 @@ class CachedBuffer(initialCapacity: Int) {
     }
 }
 
-internal val UNSAFE = run {
+val UNSAFE = run {
     val field = Unsafe::class.java.getDeclaredField("theUnsafe")
     field.isAccessible = true
     field.get(null) as Unsafe

@@ -1,4 +1,4 @@
-package dev.fastmc.common.collection.collection
+package dev.fastmc.common.collection
 
 import java.util.concurrent.atomic.AtomicIntegerArray
 

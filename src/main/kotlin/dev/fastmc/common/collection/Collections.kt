@@ -1,4 +1,4 @@
-package dev.fastmc.common.collection.collection
+package dev.fastmc.common.collection
 
 inline fun <T, reified R> Array<T>.mapArray(transform: (T) -> R): Array<R> {
     return Array(this.size) {

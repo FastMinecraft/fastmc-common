@@ -1,4 +1,4 @@
-package dev.fastmc.common.collection.collection
+package dev.fastmc.common.collection
 
 import dev.fastmc.common.collection.MutableIntIterator
 import it.unimi.dsi.fastutil.ints.IntCollection
