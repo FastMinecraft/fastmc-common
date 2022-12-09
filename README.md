@@ -1,3 +1,3 @@
 # fastmc-common
 
-Common utils for fastmd mods
+Common utils for fastmc mods
