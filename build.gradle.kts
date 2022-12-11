@@ -6,6 +6,7 @@ version = "1.0-SNAPSHOT"
 plugins {
     java
     kotlin("jvm")
+    `maven-publish`
 }
 
 allprojects {
@@ -43,6 +44,10 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
 
+    apply {
+        plugin("maven-publish")
+    }
+
     val javaVersion = project.name.substring(4).toInt()
     val fullJavaVersion = if (javaVersion <= 8) "1.$javaVersion" else javaVersion.toString()
 
@@ -50,6 +55,7 @@ subprojects {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(javaVersion))
         }
+        withSourcesJar()
     }
 
     tasks {
@@ -77,8 +83,18 @@ subprojects {
             }
         }
 
-        jar {
+        withType<Jar> {
             archiveBaseName.set(rootProject.name)
+            archiveAppendix.set(project.name)
+        }
+    }
+
+    publishing {
+        publications {
+            create<MavenPublication>(project.name) {
+                artifactId = "${rootProject.name}-${project.name}"
+                from(components["java"])
+            }
         }
     }
 }
