@@ -99,6 +99,14 @@ subprojects {
     }
 }
 
+publishing {
+    publications {
+        create<MavenPublication>(rootProject.name) {
+            from(project(":java8").components["java"])
+        }
+    }
+}
+
 tasks {
     compileKotlin {
         kotlinOptions {
