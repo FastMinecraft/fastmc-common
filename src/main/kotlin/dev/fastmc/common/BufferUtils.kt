@@ -421,10 +421,14 @@ class MemoryStack private constructor(initCapacity: Int) {
         }
     }
 
-    inline fun <T> withMalloc(size: Int, crossinline block: (ByteBuffer) -> T) {
+    inline fun <T> withMalloc(size: Int, crossinline block: (ByteBuffer) -> T): T {
+        contract {
+            callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        }
+
         val buffer = malloc0(size)
         try {
-            block(buffer)
+            return block(buffer)
         } finally {
             freeBuffer0(buffer)
         }
