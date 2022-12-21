@@ -92,6 +92,20 @@ class CachedBuffer(initialCapacity: Int) {
         return getByte()
     }
 
+    fun ensureRemainingByte(minCapacity: Int, newCapacity: Int): ByteBuffer {
+        if (byteBuffer.remaining() < minCapacity) {
+            reallocate(newCapacity)
+        }
+        return getByte()
+    }
+
+    fun ensureRemainingByte(minCapacity: Int, newCapacity: Int, maxCapacity: Int): ByteBuffer {
+        if (byteBuffer.remaining() !in minCapacity..maxCapacity) {
+            reallocate(newCapacity)
+        }
+        return getByte()
+    }
+
 
     fun getChar(): CharBuffer {
         var buffer = charBuffer
@@ -127,6 +141,20 @@ class CachedBuffer(initialCapacity: Int) {
 
     fun ensureCapacityChar(minCapacity: Int, newCapacity: Int, maxCapacity: Int): CharBuffer {
         if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getChar()
+    }
+
+    fun ensureRemainingChar(minCapacity: Int, newCapacity: Int): CharBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getChar()
+    }
+
+    fun ensureRemainingChar(minCapacity: Int, newCapacity: Int, maxCapacity: Int): CharBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4 || byteBuffer.remaining() > maxCapacity * 4) {
             reallocate(newCapacity * 4)
         }
         return getChar()
@@ -172,6 +200,13 @@ class CachedBuffer(initialCapacity: Int) {
         return getShort()
     }
 
+    fun ensureRemainingShort(minCapacity: Int, newCapacity: Int): ShortBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getShort()
+    }
+
 
     fun getInt(): IntBuffer {
         var buffer = intBuffer
@@ -212,6 +247,20 @@ class CachedBuffer(initialCapacity: Int) {
         return getInt()
     }
 
+    fun ensureRemainingInt(minCapacity: Int, newCapacity: Int): IntBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getInt()
+    }
+
+    fun ensureRemainingInt(minCapacity: Int, newCapacity: Int, maxCapacity: Int): IntBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4 || byteBuffer.remaining() > maxCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getInt()
+    }
+
 
     fun getFloat(): FloatBuffer {
         var buffer = floatBuffer
@@ -247,6 +296,20 @@ class CachedBuffer(initialCapacity: Int) {
 
     fun ensureCapacityFloat(minCapacity: Int, newCapacity: Int, maxCapacity: Int): FloatBuffer {
         if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getFloat()
+    }
+
+    fun ensureRemainingFloat(minCapacity: Int, newCapacity: Int): FloatBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4) {
+            reallocate(newCapacity * 4)
+        }
+        return getFloat()
+    }
+
+    fun ensureRemainingFloat(minCapacity: Int, newCapacity: Int, maxCapacity: Int): FloatBuffer {
+        if (byteBuffer.remaining() < minCapacity * 4 || byteBuffer.remaining() > maxCapacity * 4) {
             reallocate(newCapacity * 4)
         }
         return getFloat()
