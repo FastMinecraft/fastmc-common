@@ -77,6 +77,8 @@ subprojects {
             kotlinOptions {
                 jvmTarget = fullJavaVersion
                 freeCompilerArgs += listOf(
+                    "-Xlambdas=indy",
+                    "-Xjvm-default=all",
                     "-opt-in=kotlin.RequiresOptIn",
                     "-opt-in=kotlin.contracts.ExperimentalContracts",
                 )

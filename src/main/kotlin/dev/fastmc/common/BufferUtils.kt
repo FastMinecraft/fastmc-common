@@ -25,7 +25,7 @@ inline fun <T : Buffer> T.skip(count: Int): Buffer {
 }
 
 @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
-class CachedBuffer(
+class CachedBuffer @JvmOverloads constructor(
     initialCapacity: Int,
     val defaultSizingStrategy: SizingStrategy = SizingStrategy.AtLeastOneHalf,
     val defaultShrinkStrategy: ShrinkStrategy = ShrinkStrategy.Never
