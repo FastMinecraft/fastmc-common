@@ -83,6 +83,10 @@ subprojects {
             }
         }
 
+        named<Jar>("sourcesJar") {
+            from(rootProject.sourceSets.main.get().allSource)
+        }
+
         withType<Jar> {
             archiveBaseName.set(rootProject.name)
             archiveAppendix.set(project.name)
