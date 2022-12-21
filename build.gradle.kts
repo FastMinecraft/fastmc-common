@@ -1,5 +1,3 @@
-@file:Suppress("GradlePackageUpdate")
-
 group = "dev.fastmc"
 version = "1.0-SNAPSHOT"
 
@@ -7,128 +5,54 @@ plugins {
     java
     kotlin("jvm")
     `maven-publish`
+    id("dev.fastmc.multi-jdk").version("1.0-SNAPSHOT")
 }
 
-allprojects {
-    apply {
-        plugin("java")
-        plugin("kotlin")
-    }
+kotlin {
+    val jvmArgs = mutableSetOf<String>()
+    (rootProject.findProperty("kotlin.daemon.jvm.options") as? String)
+        ?.split("\\s+".toRegex())?.toCollection(jvmArgs)
+    System.getProperty("gradle.kotlin.daemon.jvm.options")
+        ?.split("\\s+".toRegex())?.toCollection(jvmArgs)
+    kotlinDaemonJvmArgs = jvmArgs.toList()
+}
 
-    kotlin {
-        val jvmArgs = mutableSetOf<String>()
-        (rootProject.findProperty("kotlin.daemon.jvm.options") as? String)
-            ?.split("\\s+".toRegex())?.toCollection(jvmArgs)
-        System.getProperty("gradle.kotlin.daemon.jvm.options")
-            ?.split("\\s+".toRegex())?.toCollection(jvmArgs)
-        kotlinDaemonJvmArgs = jvmArgs.toList()
-    }
+repositories {
+    mavenCentral()
+}
 
-    repositories {
-        mavenCentral()
-    }
+dependencies {
+    val kotlinxCoroutineVersion: String by rootProject
 
-    dependencies {
-        val kotlinxCoroutineVersion: String by rootProject
-
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutineVersion")
-        compileOnly("it.unimi.dsi:fastutil:7.1.0")
-    }
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutineVersion")
+    compileOnly("it.unimi.dsi:fastutil:7.1.0")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
-subprojects {
-    group = rootProject.group
-    version = rootProject.version
-
-    apply {
-        plugin("maven-publish")
-    }
-
-    val javaVersion = project.name.substring(4).toInt()
-    val fullJavaVersion = if (javaVersion <= 8) "1.$javaVersion" else javaVersion.toString()
-
-    java {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(javaVersion))
-        }
-        withSourcesJar()
-    }
-
-    tasks {
-        processResources {
-            from(rootProject.sourceSets.main.get().resources)
-        }
-
-        compileJava {
-            source(rootProject.sourceSets.main.get().java)
-
-            options.encoding = "UTF-8"
-            sourceCompatibility = fullJavaVersion
-            targetCompatibility = fullJavaVersion
-        }
-
-        compileKotlin {
-            source(rootProject.kotlin.sourceSets["main"].kotlin)
-
-            kotlinOptions {
-                jvmTarget = fullJavaVersion
-                freeCompilerArgs += listOf(
-                    "-Xlambdas=indy",
-                    "-Xjvm-default=all",
-                    "-opt-in=kotlin.RequiresOptIn",
-                    "-opt-in=kotlin.contracts.ExperimentalContracts",
-                )
-            }
-        }
-
-        named<Jar>("sourcesJar") {
-            from(rootProject.sourceSets.main.get().allSource)
-        }
-
-        withType<Jar> {
-            archiveBaseName.set(rootProject.name)
-            archiveAppendix.set(project.name)
-        }
-    }
-
-    publishing {
-        publications {
-            create<MavenPublication>(project.name) {
-                artifactId = "${rootProject.name}-${project.name}"
-                from(components["java"])
-            }
-        }
-    }
+    withSourcesJar()
 }
 
 publishing {
     publications {
-        create<MavenPublication>(rootProject.name) {
-            from(project(":java8").components["java"])
+        create<MavenPublication>("root") {
+            from(components["multi-jdk"])
         }
     }
 }
 
 tasks {
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+
     compileKotlin {
         kotlinOptions {
             freeCompilerArgs += listOf(
+                "-Xlambdas=indy",
+                "-Xjvm-default=all",
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlin.contracts.ExperimentalContracts",
             )
         }
     }
-
-    fun disableTask(it: TaskProvider<*>) {
-        it.get().enabled = false
-    }
-
-    disableTask(compileJava)
-    disableTask(compileKotlin)
-    disableTask(processResources)
-    disableTask(jar)
 }

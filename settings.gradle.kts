@@ -3,6 +3,7 @@ rootProject.name = "fastmc-common"
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        maven("https://maven.fastmc.dev/")
     }
 
     val kotlinVersion: String by settings
