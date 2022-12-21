@@ -5,7 +5,8 @@ plugins {
     java
     kotlin("jvm")
     `maven-publish`
-    id("dev.fastmc.multi-jdk").version("1.0-SNAPSHOT")
+    id("dev.fastmc.maven-repo").version("1.0.0")
+    id("dev.fastmc.multi-jdk").version("1.0.0")
 }
 
 kotlin {
