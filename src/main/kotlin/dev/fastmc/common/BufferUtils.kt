@@ -9,6 +9,7 @@ import java.nio.*
 import java.util.function.Consumer
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.math.max
 
 inline fun allocateByte(capacity: Int): ByteBuffer = ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder())
 
@@ -24,7 +25,11 @@ inline fun <T : Buffer> T.skip(count: Int): Buffer {
 }
 
 @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
-class CachedBuffer(initialCapacity: Int) {
+class CachedBuffer(
+    initialCapacity: Int,
+    val defaultSizingStrategy: SizingStrategy = SizingStrategy.AtLeastOneHalf,
+    val defaultShrinkStrategy: ShrinkStrategy = ShrinkStrategy.Never
+) {
     @Volatile
     private var byteBuffer = allocateByte(initialCapacity)
 
@@ -62,6 +67,43 @@ class CachedBuffer(initialCapacity: Int) {
         return byteBuffer
     }
 
+    fun getEnsureCapacityByte(require: Int): ByteBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            allocate(newCapacity)
+        }
+        return getByte()
+    }
+
+    fun ensureCapacityByte(require: Int): ByteBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+           reallocate(newCapacity)
+        }
+        return getByte()
+    }
+
+    fun ensureRemainingByte(require: Int): ByteBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            byteBuffer.position() + require
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+           reallocate(newCapacity)
+        }
+        return getByte()
+    }
+
+    @Deprecated("Use getEnsureCapacityByte instead")
     fun getWithCapacityByte(minCapacity: Int, newCapacity: Int): ByteBuffer {
         if (byteBuffer.capacity() < minCapacity) {
             allocate(newCapacity)
@@ -70,6 +112,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getByte()
     }
 
+    @Deprecated("Use getEnsureCapacityByte instead")
     fun getWithCapacityByte(minCapacity: Int, newCapacity: Int, maxCapacity: Int): ByteBuffer {
         if (byteBuffer.capacity() < minCapacity || byteBuffer.capacity() > maxCapacity) {
             allocate(newCapacity)
@@ -78,6 +121,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getByte()
     }
 
+    @Deprecated("Use ensureCapacityByte instead")
     fun ensureCapacityByte(minCapacity: Int, newCapacity: Int): ByteBuffer {
         if (byteBuffer.capacity() < minCapacity) {
             reallocate(newCapacity)
@@ -85,22 +129,9 @@ class CachedBuffer(initialCapacity: Int) {
         return getByte()
     }
 
+    @Deprecated("Use ensureCapacityByte instead")
     fun ensureCapacityByte(minCapacity: Int, newCapacity: Int, maxCapacity: Int): ByteBuffer {
         if (byteBuffer.capacity() !in minCapacity..maxCapacity) {
-            reallocate(newCapacity)
-        }
-        return getByte()
-    }
-
-    fun ensureRemainingByte(minCapacity: Int, newCapacity: Int): ByteBuffer {
-        if (byteBuffer.remaining() < minCapacity) {
-            reallocate(newCapacity)
-        }
-        return getByte()
-    }
-
-    fun ensureRemainingByte(minCapacity: Int, newCapacity: Int, maxCapacity: Int): ByteBuffer {
-        if (byteBuffer.remaining() !in minCapacity..maxCapacity) {
             reallocate(newCapacity)
         }
         return getByte()
@@ -116,46 +147,72 @@ class CachedBuffer(initialCapacity: Int) {
         return buffer
     }
 
+    fun getEnsureCapacityChar(require: Int): CharBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 2
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            allocate(newCapacity)
+        }
+        return getChar()
+    }
+
+    fun ensureCapacityChar(require: Int): CharBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 2
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getChar()
+    }
+
+    fun ensureRemainingChar(require: Int): CharBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            byteBuffer.position() + require * 2
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getChar()
+    }
+
+    @Deprecated("Use getEnsureCapacityChar instead")
     fun getWithCapacityChar(minCapacity: Int, newCapacity: Int): CharBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4) {
-            allocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2) {
+            allocate(newCapacity * 2)
         }
         byteBuffer.clear()
         return getChar()
     }
 
+    @Deprecated("Use getEnsureCapacityChar instead")
     fun getWithCapacityChar(minCapacity: Int, newCapacity: Int, maxCapacity: Int): CharBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
-            allocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2 || byteBuffer.capacity() > maxCapacity * 2) {
+            allocate(newCapacity * 2)
         }
         byteBuffer.clear()
         return getChar()
     }
 
+    @Deprecated("Use ensureCapacityChar instead")
     fun ensureCapacityChar(minCapacity: Int, newCapacity: Int): CharBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4) {
-            reallocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2) {
+            reallocate(newCapacity * 2)
         }
         return getChar()
     }
 
+    @Deprecated("Use ensureCapacityChar instead")
     fun ensureCapacityChar(minCapacity: Int, newCapacity: Int, maxCapacity: Int): CharBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getChar()
-    }
-
-    fun ensureRemainingChar(minCapacity: Int, newCapacity: Int): CharBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getChar()
-    }
-
-    fun ensureRemainingChar(minCapacity: Int, newCapacity: Int, maxCapacity: Int): CharBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4 || byteBuffer.remaining() > maxCapacity * 4) {
-            reallocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2 || byteBuffer.capacity() > maxCapacity * 2) {
+            reallocate(newCapacity * 2)
         }
         return getChar()
     }
@@ -170,39 +227,72 @@ class CachedBuffer(initialCapacity: Int) {
         return buffer
     }
 
+    fun getEnsureCapacityShort(require: Int): ShortBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 2
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            allocate(newCapacity)
+        }
+        return getShort()
+    }
+
+    fun ensureCapacityShort(require: Int): ShortBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 2
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getShort()
+    }
+
+    fun ensureRemainingShort(require: Int): ShortBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            byteBuffer.position() + require * 2
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getShort()
+    }
+
+    @Deprecated("Use getEnsureCapacityShort instead")
     fun getWithCapacityShort(minCapacity: Int, newCapacity: Int): ShortBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4) {
-            allocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2) {
+            allocate(newCapacity * 2)
         }
         byteBuffer.clear()
         return getShort()
     }
 
+    @Deprecated("Use getEnsureCapacityShort instead")
     fun getWithCapacityShort(minCapacity: Int, newCapacity: Int, maxCapacity: Int): ShortBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
-            allocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2 || byteBuffer.capacity() > maxCapacity * 2) {
+            allocate(newCapacity * 2)
         }
         byteBuffer.clear()
         return getShort()
     }
 
+    @Deprecated("Use ensureCapacityShort instead")
     fun ensureCapacityShort(minCapacity: Int, newCapacity: Int): ShortBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4) {
-            reallocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2) {
+            reallocate(newCapacity * 2)
         }
         return getShort()
     }
 
+    @Deprecated("Use ensureCapacityShort instead")
     fun ensureCapacityShort(minCapacity: Int, newCapacity: Int, maxCapacity: Int): ShortBuffer {
-        if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getShort()
-    }
-
-    fun ensureRemainingShort(minCapacity: Int, newCapacity: Int): ShortBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4) {
-            reallocate(newCapacity * 4)
+        if (byteBuffer.capacity() < minCapacity * 2 || byteBuffer.capacity() > maxCapacity * 2) {
+            reallocate(newCapacity * 2)
         }
         return getShort()
     }
@@ -217,6 +307,43 @@ class CachedBuffer(initialCapacity: Int) {
         return buffer
     }
 
+    fun getEnsureCapacityInt(require: Int): IntBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 4
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            allocate(newCapacity)
+        }
+        return getInt()
+    }
+
+    fun ensureCapacityInt(require: Int): IntBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 4
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getInt()
+    }
+
+    fun ensureRemainingInt(require: Int): IntBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            byteBuffer.position() + require * 4
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getInt()
+    }
+
+    @Deprecated("Use getEnsureCapacityInt instead")
     fun getWithCapacityInt(minCapacity: Int, newCapacity: Int): IntBuffer {
         if (byteBuffer.capacity() < minCapacity * 4) {
             allocate(newCapacity * 4)
@@ -225,6 +352,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getInt()
     }
 
+    @Deprecated("Use getEnsureCapacityInt instead")
     fun getWithCapacityInt(minCapacity: Int, newCapacity: Int, maxCapacity: Int): IntBuffer {
         if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
             allocate(newCapacity * 4)
@@ -233,6 +361,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getInt()
     }
 
+    @Deprecated("Use ensureCapacityInt instead")
     fun ensureCapacityInt(minCapacity: Int, newCapacity: Int): IntBuffer {
         if (byteBuffer.capacity() < minCapacity * 4) {
             reallocate(newCapacity * 4)
@@ -240,22 +369,9 @@ class CachedBuffer(initialCapacity: Int) {
         return getInt()
     }
 
+    @Deprecated("Use ensureCapacityInt instead")
     fun ensureCapacityInt(minCapacity: Int, newCapacity: Int, maxCapacity: Int): IntBuffer {
         if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getInt()
-    }
-
-    fun ensureRemainingInt(minCapacity: Int, newCapacity: Int): IntBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getInt()
-    }
-
-    fun ensureRemainingInt(minCapacity: Int, newCapacity: Int, maxCapacity: Int): IntBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4 || byteBuffer.remaining() > maxCapacity * 4) {
             reallocate(newCapacity * 4)
         }
         return getInt()
@@ -271,6 +387,31 @@ class CachedBuffer(initialCapacity: Int) {
         return buffer
     }
 
+    fun getEnsureCapacityFloat(require: Int): FloatBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 4
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            allocate(newCapacity)
+        }
+        return getFloat()
+    }
+
+    fun ensureCapacityFloat(require: Int): FloatBuffer {
+        val newCapacity = computeNewCapacity(
+            defaultSizingStrategy,
+            defaultShrinkStrategy,
+            require * 4
+        )
+        if (newCapacity != byteBuffer.capacity()) {
+            reallocate(newCapacity)
+        }
+        return getFloat()
+    }
+
+    @Deprecated("Use getEnsureCapacityFloat instead")
     fun getWithCapacityFloat(minCapacity: Int, newCapacity: Int): FloatBuffer {
         if (byteBuffer.capacity() < minCapacity * 4) {
             allocate(newCapacity * 4)
@@ -279,6 +420,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getFloat()
     }
 
+    @Deprecated("Use getEnsureCapacityFloat instead")
     fun getWithCapacityFloat(minCapacity: Int, newCapacity: Int, maxCapacity: Int): FloatBuffer {
         if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
             allocate(newCapacity * 4)
@@ -287,6 +429,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getFloat()
     }
 
+    @Deprecated("Use ensureCapacityFloat instead")
     fun ensureCapacityFloat(minCapacity: Int, newCapacity: Int): FloatBuffer {
         if (byteBuffer.capacity() < minCapacity * 4) {
             reallocate(newCapacity * 4)
@@ -294,6 +437,7 @@ class CachedBuffer(initialCapacity: Int) {
         return getFloat()
     }
 
+    @Deprecated("Use ensureCapacityFloat instead")
     fun ensureCapacityFloat(minCapacity: Int, newCapacity: Int, maxCapacity: Int): FloatBuffer {
         if (byteBuffer.capacity() < minCapacity * 4 || byteBuffer.capacity() > maxCapacity * 4) {
             reallocate(newCapacity * 4)
@@ -301,22 +445,71 @@ class CachedBuffer(initialCapacity: Int) {
         return getFloat()
     }
 
-    fun ensureRemainingFloat(minCapacity: Int, newCapacity: Int): FloatBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getFloat()
-    }
-
-    fun ensureRemainingFloat(minCapacity: Int, newCapacity: Int, maxCapacity: Int): FloatBuffer {
-        if (byteBuffer.remaining() < minCapacity * 4 || byteBuffer.remaining() > maxCapacity * 4) {
-            reallocate(newCapacity * 4)
-        }
-        return getFloat()
-    }
-
     fun free() {
         byteBuffer.free()
+    }
+
+    private fun computeNewCapacity(
+        sizingStrategy: SizingStrategy,
+        shrinkStrategy: ShrinkStrategy,
+        targetBytes: Int
+    ): Int {
+        val current = byteBuffer.capacity()
+        return if (targetBytes > current || shrinkStrategy.shouldShrink(current, targetBytes)) {
+            sizingStrategy.newCapacity(current, targetBytes)
+        } else {
+            current
+        }
+    }
+
+    sealed interface SizingStrategy {
+        fun newCapacity(current: Int, target: Int): Int
+
+        object AtLeastOneHalf : SizingStrategy {
+            override fun newCapacity(current: Int, target: Int): Int {
+                return max(current + (current shr 1), target)
+            }
+        }
+
+        object AtLeastDouble : SizingStrategy {
+            override fun newCapacity(current: Int, target: Int): Int {
+                return max(current * 2, target)
+            }
+        }
+
+        class Constant(private val value: Int) : SizingStrategy {
+            override fun newCapacity(current: Int, target: Int): Int {
+                return max(current + value, target)
+            }
+        }
+
+        object PowerOfTwo : SizingStrategy {
+            override fun newCapacity(current: Int, target: Int): Int {
+                return MathUtils.ceilToPOT(target)
+            }
+        }
+    }
+
+    interface ShrinkStrategy {
+        fun shouldShrink(current: Int, target: Int): Boolean
+
+        object Never : ShrinkStrategy {
+            override fun shouldShrink(current: Int, target: Int): Boolean {
+                return false
+            }
+        }
+
+        object HalfEmpty : ShrinkStrategy {
+            override fun shouldShrink(current: Int, target: Int): Boolean {
+                return current - target > current / 2
+            }
+        }
+
+        object QuarterEmpty : ShrinkStrategy {
+            override fun shouldShrink(current: Int, target: Int): Boolean {
+                return current - target > current / 4
+            }
+        }
     }
 }
 
