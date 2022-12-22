@@ -8,7 +8,7 @@ plugins {
     kotlin("jvm")
     `maven-publish`
     id("dev.fastmc.maven-repo").version("1.0.0")
-    id("dev.fastmc.multi-jdk").version("1.1.0")
+    id("dev.fastmc.multi-jdk").version("1.1.1")
 }
 
 kotlin {
@@ -25,7 +25,7 @@ java {
 }
 
 multiJdk {
-    defaultJavaVersion(JavaLanguageVersion.of(8))
+    newJavaVersion(JavaLanguageVersion.of(8))
     newJavaVersion(JavaLanguageVersion.of(17))
 }
 
@@ -43,7 +43,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("root") {
-            from(components["java"])
+            from(components["multi-jdk"])
         }
     }
 }
@@ -63,71 +63,4 @@ tasks {
             )
         }
     }
-}
-
-fun SourceSet.configureForJavaVersion(
-    javaVersion: JavaLanguageVersion
-): SourceSet {
-    val fullJavaVersion = if (javaVersion.asInt() <= 8) "1.${javaVersion.asInt()}" else javaVersion.asInt().toString()
-    project.afterEvaluate {
-        val jarTask = tasks.named(jarTaskName, Jar::class.java) {
-            archiveClassifier.set("java${javaVersion.asInt()}")
-        }
-        artifacts {
-            archives(jarTask)
-        }
-    }
-
-    compileClasspath = sourceSets.main.get().compileClasspath
-    runtimeClasspath = sourceSets.main.get().runtimeClasspath
-    resources.setSrcDirs(sourceSets.main.get().resources.srcDirs)
-    java.setSrcDirs(sourceSets.main.get().java.srcDirs)
-    kotlin.setSrcDirs(sourceSets.main.get().kotlin.srcDirs)
-
-    tasks.named(compileJavaTaskName, JavaCompile::class.java) {
-        javaToolchains { javaCompiler.set(compilerFor { languageVersion.set(javaVersion) }) }
-        options.let { sub ->
-            tasks.compileJava.get().options.let { root ->
-                sub.encoding = root.encoding
-                sub.compilerArgs = root.compilerArgs
-                sub.isIncremental = root.isIncremental
-                sub.isDeprecation = root.isDeprecation
-                sub.isWarnings = root.isWarnings
-                sub.isDebug = root.isDebug
-                sub.isListFiles = root.isListFiles
-                sub.isFailOnError = root.isFailOnError
-            }
-            sourceCompatibility = fullJavaVersion
-            targetCompatibility = fullJavaVersion
-        }
-    }
-
-    tasks.named(
-        getCompileTaskName("kotlin"),
-        KotlinCompile::class.java
-    ) {
-        javaToolchains {
-            kotlinJavaToolchain.toolchain.use(launcherFor {
-                languageVersion.set(javaVersion)
-            })
-        }
-        kotlinOptions.let { sub ->
-            tasks.compileKotlin.get().kotlinOptions.let { root ->
-                sub.allWarningsAsErrors = root.allWarningsAsErrors
-                sub.apiVersion = root.apiVersion
-                sub.freeCompilerArgs = root.freeCompilerArgs
-                sub.javaParameters = root.javaParameters
-                sub.languageVersion = root.languageVersion
-                sub.moduleName = root.moduleName
-                sub.noJdk = root.noJdk
-                sub.suppressWarnings = root.suppressWarnings
-                sub.useK2 = root.useK2
-                sub.useOldBackend = root.useOldBackend
-                sub.verbose = root.verbose
-            }
-            sub.jvmTarget = fullJavaVersion
-        }
-    }
-
-    return this
 }
