@@ -23,7 +23,7 @@ java {
 }
 
 multiJdk {
-    newJavaVersion(JavaLanguageVersion.of(8))
+    baseJavaVersion(JavaLanguageVersion.of(8))
     newJavaVersion(JavaLanguageVersion.of(17))
 }
 
@@ -33,6 +33,11 @@ repositories {
 
 dependencies {
     val kotlinxCoroutineVersion: String by rootProject
+
+    testImplementation(kotlin("test"))
+    testImplementation("it.unimi.dsi:fastutil:7.1.0")
+
+    implementation(kotlin("stdlib-jdk8"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutineVersion")
     compileOnly("it.unimi.dsi:fastutil:7.1.0")
@@ -47,6 +52,11 @@ publishing {
 }
 
 tasks {
+    test {
+        useJUnitPlatform()
+        jvmArgs("-Xmx2G")
+    }
+
     compileJava {
         options.encoding = "UTF-8"
     }
