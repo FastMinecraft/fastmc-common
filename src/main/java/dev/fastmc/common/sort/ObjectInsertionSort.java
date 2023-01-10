@@ -4,36 +4,36 @@ import java.util.Comparator;
 
 @SuppressWarnings("DuplicatedCode")
 public class ObjectInsertionSort implements ObjectSort {
-    public static <T extends Comparable<T>> void sort(T[] x, int from, int to) {
+    public static <T extends Comparable<T>> void sort(T[] array, int from, int to) {
         for (int i1 = from; i1 < to; i1++) {
-            T v1 = x[i1];
+            T v1 = array[i1];
             int i2 = i1;
             T v2;
-            for (;i2 > from && v1.compareTo(v2 = x[i2 - 1]) < 0;i2--) {
-                x[i2] = v2;
+            for (;i2 > from && v1.compareTo(v2 = array[i2 - 1]) < 0;i2--) {
+                array[i2] = v2;
             }
-            x[i2] = v1;
+            array[i2] = v1;
         }
     }
 
-    public static <T extends Comparable<T>> void sort(T[] x) {
-        sort(x, 0, x.length);
+    public static <T extends Comparable<T>> void sort(T[] array) {
+        sort(array, 0, array.length);
     }
 
-    public static <T> void sort(T[] x, int from, int to, Comparator<T> comp) {
+    public static <T> void sort(T[] array, int from, int to, Comparator<T> comp) {
         for (int i1 = from; i1 < to; i1++) {
-            T v1 = x[i1];
+            T v1 = array[i1];
             int i2 = i1;
             T v2;
-            for (;i2 > from && comp.compare(v1, v2 = x[i2 - 1]) < 0;i2--) {
-                x[i2] = v2;
+            for (;i2 > from && comp.compare(v1, v2 = array[i2 - 1]) < 0;i2--) {
+                array[i2] = v2;
             }
-            x[i2] = v1;
+            array[i2] = v1;
         }
     }
 
-    public static <T> void sort(T[] x, Comparator<T> comp) {
-        sort(x, 0, x.length, comp);
+    public static <T> void sort(T[] array, Comparator<T> comp) {
+        sort(array, 0, array.length, comp);
     }
 
     private ObjectInsertionSort() {}

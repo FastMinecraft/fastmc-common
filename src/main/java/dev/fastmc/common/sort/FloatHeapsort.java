@@ -1,42 +1,40 @@
 package dev.fastmc.common.sort;
 
-import java.util.Comparator;
-
 @SuppressWarnings("DuplicatedCode")
-public class ObjectHeapsort implements ObjectSort {
-    private static <T extends Comparable<T>> void siftDown(T[] array, int p, T value, int from, int to) {
+public class FloatHeapsort implements FloatSort {
+    private static void siftDown(float[] array, int p, float value, int from, int to) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
             if (k > to) {
                 break;
             }
-            if (k == to || array[k].compareTo(array[k - 1]) < 0) {
+            if (k == to || array[k] < array[k - 1]) {
                 --k;
             }
-            if (array[k].compareTo(value) <= 0) {
+            if (array[k] <= value) {
                 break;
             }
         }
         array[p] = value;
     }
 
-    public static <T extends Comparable<T>> void sort(T[] array, int from, int to) {
+    public static void sort(float[] array, int from, int to) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to);
         }
         while (--to > from) {
-            T max = array[from];
+            float max = array[from];
             siftDown(array, from, array[to], from, to);
             array[to] = max;
         }
     }
 
-    public static <T extends Comparable<T>> void sort(T[] array) {
+    public static void sort(float[] array) {
         sort(array, 0, array.length);
     }
 
-    private static <T> void siftDown(T[] array, int p, T value, int from, int to, Comparator<T> comp) {
+    private static void siftDown(float[] array, int p, float value, int from, int to, FloatComparator comp) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
@@ -53,42 +51,42 @@ public class ObjectHeapsort implements ObjectSort {
         array[p] = value;
     }
 
-    public static <T> void sort(T[] array, int from, int to, Comparator<T> comp) {
+    public static void sort(float[] array, int from, int to, FloatComparator comp) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to, comp);
         }
         while (--to > from) {
-            T max = array[from];
+            float max = array[from];
             siftDown(array, from, array[to], from, to, comp);
             array[to] = max;
         }
     }
 
-    public static <T> void sort(T[] array, Comparator<T> comp) {
+    public static void sort(float[] array, FloatComparator comp) {
         sort(array, 0, array.length, comp);
     }
 
-    private ObjectHeapsort() {}
+    private FloatHeapsort() {}
 
-    public static final ObjectHeapsort INSTANCE = new ObjectHeapsort();
+    public static final FloatHeapsort INSTANCE = new FloatHeapsort();
 
     @Override
-    public <T extends Comparable<T>> void iSort(T[] array, int from, int to) {
+    public void iSort(float[] array, int from, int to) {
         sort(array, from, to);
     }
 
     @Override
-    public <T extends Comparable<T>> void iSort(T[] array) {
+    public void iSort(float[] array) {
         sort(array);
     }
 
     @Override
-    public <T> void iSort(T[] array, int from, int to, Comparator<T> comparator) {
-        sort(array, from, to, comparator);
+    public void iSort(float[] array, int from, int to, FloatComparator comp) {
+        sort(array, from, to, comp);
     }
 
     @Override
-    public <T> void iSort(T[] array, Comparator<T> comparator) {
-        sort(array, comparator);
+    public void iSort(float[] array, FloatComparator comp) {
+        sort(array, comp);
     }
 }

@@ -1,8 +1,8 @@
 package dev.fastmc.common.sort;
 
 @SuppressWarnings("DuplicatedCode")
-public class IntHeapsort implements IntSort {
-    private static void siftDown(int[] array, int p, int value, int from, int to) {
+public class ByteHeapsort implements ByteSort {
+    private static void siftDown(byte[] array, int p, byte value, int from, int to) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
@@ -19,86 +19,86 @@ public class IntHeapsort implements IntSort {
         array[p] = value;
     }
 
-    public static void sort(int[] array, int from, int to) {
+    public static void sort(byte[] array, int from, int to) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to);
         }
         while (--to > from) {
-            int max = array[from];
+            byte max = array[from];
             siftDown(array, from, array[to], from, to);
             array[to] = max;
         }
     }
 
-    public static void sort(int[] array) {
+    public static void sort(byte[] array) {
         sort(array, 0, array.length);
     }
 
-    private static void siftDown(int[] array, int p, int value, int from, int to, int[] keys) {
+    private static void siftDown(byte[] array, int p, byte value, int from, int to, int[] keys) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
             if (k > to) {
                 break;
             }
-            if (k == to || keys[array[k]] < keys[array[k - 1]]) {
+            if (k == to || keys[(int) array[k] & 0xFF] < keys[(int) array[k - 1] & 0xFF]) {
                 --k;
             }
-            if (keys[array[k]] <= keys[value]) {
+            if (keys[(int) array[k] & 0xFF] <= keys[(int) value & 0xFF]) {
                 break;
             }
         }
         array[p] = value;
     }
 
-    public static void sort(int[] array, int from, int to, int[] keys) {
+    public static void sort(byte[] array, int from, int to, int[] keys) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to, keys);
         }
         while (--to > from) {
-            int max = array[from];
+            byte max = array[from];
             siftDown(array, from, array[to], from, to, keys);
             array[to] = max;
         }
     }
 
-    public static void sort(int[] array, int[] keys) {
+    public static void sort(byte[] array, int[] keys) {
         sort(array, 0, array.length, keys);
     }
 
-    private static void siftDown(int[] array, int p, int value, int from, int to, float[] keys) {
+    private static void siftDown(byte[] array, int p, byte value, int from, int to, float[] keys) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
             if (k > to) {
                 break;
             }
-            if (k == to || keys[array[k]] < keys[array[k - 1]]) {
+            if (k == to || keys[(int) array[k] & 0xFF] < keys[(int) array[k - 1] & 0xFF]) {
                 --k;
             }
-            if (keys[array[k]] <= keys[value]) {
+            if (keys[(int) array[k] & 0xFF] <= keys[(int) value & 0xFF]) {
                 break;
             }
         }
         array[p] = value;
     }
 
-    public static void sort(int[] array, int from, int to, float[] keys) {
+    public static void sort(byte[] array, int from, int to, float[] keys) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to, keys);
         }
         while (--to > from) {
-            int max = array[from];
+            byte max = array[from];
             siftDown(array, from, array[to], from, to, keys);
             array[to] = max;
         }
     }
 
-    public static void sort(int[] array, float[] keys) {
+    public static void sort(byte[] array, float[] keys) {
         sort(array, 0, array.length, keys);
     }
 
-    private static void siftDown(int[] array, int p, int value, int from, int to, IntComparator comp) {
+    private static void siftDown(byte[] array, int p, byte value, int from, int to, ByteComparator comp) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
@@ -115,62 +115,62 @@ public class IntHeapsort implements IntSort {
         array[p] = value;
     }
 
-    public static void sort(int[] array, int from, int to, IntComparator comp) {
+    public static void sort(byte[] array, int from, int to, ByteComparator comp) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to, comp);
         }
         while (--to > from) {
-            int max = array[from];
+            byte max = array[from];
             siftDown(array, from, array[to], from, to, comp);
             array[to] = max;
         }
     }
 
-    public static void sort(int[] array, IntComparator comp) {
+    public static void sort(byte[] array, ByteComparator comp) {
         sort(array, 0, array.length, comp);
     }
 
-    private IntHeapsort() {}
+    private ByteHeapsort() {}
 
-    public static final IntHeapsort INSTANCE = new IntHeapsort();
+    public static final ByteHeapsort INSTANCE = new ByteHeapsort();
 
     @Override
-    public void iSort(int[] array, int from, int to) {
+    public void iSort(byte[] array, int from, int to) {
         sort(array, from, to);
     }
 
     @Override
-    public void iSort(int[] array) {
+    public void iSort(byte[] array) {
         sort(array);
     }
 
     @Override
-    public void iSort(int[] array, int from, int to, int[] keys) {
+    public void iSort(byte[] array, int from, int to, int[] keys) {
         sort(array, from, to, keys);
     }
 
     @Override
-    public void iSort(int[] array, int[] keys) {
+    public void iSort(byte[] array, int[] keys) {
         sort(array, keys);
     }
 
     @Override
-    public void iSort(int[] array, int from, int to, float[] keys) {
+    public void iSort(byte[] array, int from, int to, float[] keys) {
         sort(array, from, to, keys);
     }
 
     @Override
-    public void iSort(int[] array, float[] keys) {
+    public void iSort(byte[] array, float[] keys) {
         sort(array, keys);
     }
 
     @Override
-    public void iSort(int[] array, int from, int to, IntComparator comp) {
+    public void iSort(byte[] array, int from, int to, ByteComparator comp) {
         sort(array, from, to, comp);
     }
 
     @Override
-    public void iSort(int[] array, IntComparator comp) {
+    public void iSort(byte[] array, ByteComparator comp) {
         sort(array, comp);
     }
 }

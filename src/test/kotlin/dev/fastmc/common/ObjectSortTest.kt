@@ -10,7 +10,7 @@ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class ObjecjSortTest : SortTest() {
+class ObjectSortTest : SortTest() {
     @Test
     fun heapsort() {
         testSort(ObjectHeapsort.INSTANCE)
