@@ -2,15 +2,15 @@ package dev.fastmc.common
 
 import java.util.function.Consumer
 
-class DoubleBuffered<T>(front: T, back: T, private val initAction: Consumer<T>) {
+class DoubleBuffered<T>(provider: () -> T, private val initAction: Consumer<in T>) {
     @Suppress("UNCHECKED_CAST")
-    constructor(front: T, swap: T) : this(front, swap, DEFAULT_INIT_ACTION as Consumer<T>)
+    constructor(provider: () -> T) : this(provider, DEFAULT_INIT_ACTION as Consumer<T>)
 
     @Volatile
-    var front = front; private set
+    var front = provider(); private set
 
     @Volatile
-    var back = back; private set
+    var back = provider(); private set
 
     fun swap() {
         val temp = front
@@ -26,7 +26,7 @@ class DoubleBuffered<T>(front: T, back: T, private val initAction: Consumer<T>) 
         initAction.accept(back)
     }
 
-    private companion object {
+    companion object {
         val DEFAULT_INIT_ACTION = Consumer<Any?> {
 
         }
