@@ -2,35 +2,37 @@ package dev.fastmc.common
 
 import java.util.function.Consumer
 
-class DoubleBuffered<T>(value: T, private var swap: T, private val initAction: Consumer<T>) {
+class DoubleBuffered<T>(front: T, back: T, private val initAction: Consumer<T>) {
     @Suppress("UNCHECKED_CAST")
-    constructor(value: T, swap: T) : this(value, swap, DEFAULT_INIT_ACTION as Consumer<T>)
+    constructor(front: T, swap: T) : this(front, swap, DEFAULT_INIT_ACTION as Consumer<T>)
 
-    private var delegate = value
+    @Volatile
+    var front = front; private set
 
-    fun get(): T {
-        return delegate
+    @Volatile
+    var back = back; private set
+
+    fun swap() {
+        val temp = front
+        front = back
+        back = temp
     }
 
-    fun getAndSwap(): T {
-        val temp = delegate
-        initAction.accept(swap)
-        delegate = swap
-        swap = temp
-        return swap
+    fun initFront() {
+        initAction.accept(front)
     }
 
-    fun swapAndGet(): T {
-        val temp = delegate
-        initAction.accept(swap)
-        delegate = swap
-        swap = temp
-        return delegate
+    fun initBack() {
+        initAction.accept(back)
     }
 
     private companion object {
         val DEFAULT_INIT_ACTION = Consumer<Any?> {
 
+        }
+
+        val CLEAR_INIT_ACTION = Consumer<MutableCollection<*>> {
+            it.clear()
         }
     }
 }
