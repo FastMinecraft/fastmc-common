@@ -1,16 +1,18 @@
 package dev.fastmc.common
 
 import java.util.function.Consumer
+import java.util.function.Supplier
+import java.util.function.UnaryOperator
 
-class DoubleBuffered<T>(provider: () -> T, private val initAction: Consumer<in T>) {
+class DoubleBuffered<T>(supplier: Supplier<T>, private val initAction: Consumer<in T>) {
     @Suppress("UNCHECKED_CAST")
-    constructor(provider: () -> T) : this(provider, DEFAULT_INIT_ACTION as Consumer<T>)
+    constructor(supplier: Supplier<T>) : this(supplier, DEFAULT_INIT_ACTION as Consumer<T>)
 
     @Volatile
-    var front = provider(); private set
+    var front = supplier.get(); private set
 
     @Volatile
-    var back = provider(); private set
+    var back = supplier.get(); private set
 
     fun swap(): DoubleBuffered<T> {
         val temp = front
