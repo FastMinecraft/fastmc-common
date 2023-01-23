@@ -12,25 +12,36 @@ class DoubleBuffered<T>(provider: () -> T, private val initAction: Consumer<in T
     @Volatile
     var back = provider(); private set
 
-    fun swap() {
+    fun swap(): DoubleBuffered<T> {
         val temp = front
         front = back
         back = temp
+        return this
     }
 
-    fun initFront() {
+    fun initFrontBack(): DoubleBuffered<T> {
         initAction.accept(front)
+        initAction.accept(back)
+        return this
     }
 
-    fun initBack() {
+    fun initFront(): DoubleBuffered<T> {
+        initAction.accept(front)
+        return this
+    }
+
+    fun initBack(): DoubleBuffered<T> {
         initAction.accept(back)
+        return this
     }
 
     companion object {
+        @JvmField
         val DEFAULT_INIT_ACTION = Consumer<Any?> {
 
         }
 
+        @JvmField
         val CLEAR_INIT_ACTION = Consumer<MutableCollection<*>> {
             it.clear()
         }
