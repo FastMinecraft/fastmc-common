@@ -1,6 +1,8 @@
 package dev.fastmc.common.collection
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectArrays
+import kotlin.math.max
 
 class FastObjectArrayList<E> : ObjectArrayList<E> {
     private constructor(array: Array<E>, dummy: Boolean) : super(array, dummy)
@@ -30,7 +32,23 @@ class FastObjectArrayList<E> : ObjectArrayList<E> {
     fun clearAndTrim() {
         size = 0
         @Suppress("UNCHECKED_CAST")
-        a = emptyArray<Any?>() as Array<out E>
+        a = if (wrapped) {
+            ObjectArrays.trim(a, 0)
+        } else {
+            emptyArray<Any?>() as Array<out E>
+        }
+    }
+
+    override fun trim(n: Int) {
+        if (n >= a.size || size == a.size) return
+        a = if (wrapped) {
+            ObjectArrays.trim(a, max(n, size))
+        } else {
+            @Suppress("UNCHECKED_CAST")
+            val t = arrayOfNulls<Any?>(max(n, size)) as Array<out E>
+            System.arraycopy(a, 0, t, 0, size)
+            t
+        }
     }
 
     fun clearFast() {
@@ -44,16 +62,26 @@ class FastObjectArrayList<E> : ObjectArrayList<E> {
     companion object {
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun <K> wrap(a: Array<K?>, length: Int): FastObjectArrayList<K> {
+        fun <E> wrap(a: Array<E?>, length: Int): FastObjectArrayList<E> {
             require(length <= a.size) { "The specified length (" + length + ") is greater than the array size (" + a.size + ")" }
             val l = FastObjectArrayList(a, false)
             l.size = length
-            return l as FastObjectArrayList<K>
+            return l as FastObjectArrayList<E>
         }
 
         @JvmStatic
-        fun <K> wrap(a: Array<K?>): FastObjectArrayList<K> {
+        fun <E> wrap(a: Array<E?>): FastObjectArrayList<E> {
             return wrap(a, a.size)
+        }
+
+        @JvmStatic
+        inline fun <reified E> typed(capacity: Int): FastObjectArrayList<E> {
+            return wrap(arrayOfNulls(capacity), 0)
+        }
+
+        @JvmStatic
+        inline fun <reified E> typed(): FastObjectArrayList<E> {
+            return typed(DEFAULT_INITIAL_CAPACITY)
         }
     }
 }
