@@ -2,26 +2,26 @@ package dev.fastmc.common.sort;
 
 import java.util.Comparator;
 
-@SuppressWarnings("DuplicatedCode")
+@SuppressWarnings({ "DuplicatedCode", "unchecked" })
 public class ObjectHeapsort implements ObjectSort {
-    private static <T extends Comparable<T>> void siftDown(T[] array, int p, T value, int from, int to) {
+    private static <T> void siftDown(T[] array, int p, T value, int from, int to) {
         for (int k; ; array[p] = array[p = k]) {
             k = (p << 1) - from + 2; // Index of the right child
 
             if (k > to) {
                 break;
             }
-            if (k == to || array[k].compareTo(array[k - 1]) < 0) {
+            if (k == to || ((Comparable<T>) array[k]).compareTo(array[k - 1]) < 0) {
                 --k;
             }
-            if (array[k].compareTo(value) <= 0) {
+            if (((Comparable<T>) array[k]).compareTo(value) <= 0) {
                 break;
             }
         }
         array[p] = value;
     }
 
-    public static <T extends Comparable<T>> void sort(T[] array, int from, int to) {
+    public static <T> void sort(T[] array, int from, int to) {
         for (int k = (from + to) >>> 1; k > from; ) {
             siftDown(array, --k, array[k], from, to);
         }
@@ -32,7 +32,7 @@ public class ObjectHeapsort implements ObjectSort {
         }
     }
 
-    public static <T extends Comparable<T>> void sort(T[] array) {
+    public static <T> void sort(T[] array) {
         sort(array, 0, array.length);
     }
 
@@ -73,12 +73,12 @@ public class ObjectHeapsort implements ObjectSort {
     public static final ObjectHeapsort INSTANCE = new ObjectHeapsort();
 
     @Override
-    public <T extends Comparable<T>> void iSort(T[] array, int from, int to) {
+    public <T> void iSort(T[] array, int from, int to) {
         sort(array, from, to);
     }
 
     @Override
-    public <T extends Comparable<T>> void iSort(T[] array) {
+    public <T> void iSort(T[] array) {
         sort(array);
     }
 
