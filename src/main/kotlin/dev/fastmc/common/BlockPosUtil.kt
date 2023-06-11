@@ -3,7 +3,7 @@ package dev.fastmc.common
 object BlockPosUtil {
 
     private fun isPowerOfTwo(value: Int): Boolean {
-        return value != 0 && value and value - 1 == 0
+        return value != 0 && (value and (value - 1)) == 0
     }
 
     private fun log2DeBruijn(input: Int): Int {
@@ -46,25 +46,27 @@ object BlockPosUtil {
     }
 
     private fun log2(value: Int): Int {
-        return log2DeBruijn(value) - if (isPowerOfTwo(value)) 0 else 1
+        return log2DeBruijn(value) - (if (isPowerOfTwo(value)) 0 else 1)
     }
 
     private fun smallestEncompassingPowerOfTwo(value: Int): Int {
         var i = value - 1
-        i = i or i shr 1
-        i = i or i shr 2
-        i = i or i shr 4
-        i = i or i shr 8
-        i = i or i shr 16
+        i = i or (i shr 1)
+        i = i or (i shr 2)
+        i = i or (i shr 4)
+        i = i or (i shr 8)
+        i = i or (i shr 16)
         return i + 1
     }
 
     private val NUM_X_BITS: Int = 1 + log2(smallestEncompassingPowerOfTwo(30000000))
-
     private val NUM_Z_BITS = NUM_X_BITS
     private val NUM_Y_BITS = 64 - NUM_X_BITS - NUM_Z_BITS
-    private val Y_SHIFT = 0 + NUM_Z_BITS
+
+    private const val Z_SHIFT = 0
+    private val Y_SHIFT = Z_SHIFT + NUM_Z_BITS
     private val X_SHIFT = Y_SHIFT + NUM_Y_BITS
+
     private val X_MASK = (1L shl NUM_X_BITS) - 1L
     private val Y_MASK = (1L shl NUM_Y_BITS) - 1L
     private val Z_MASK = (1L shl NUM_Z_BITS) - 1L
@@ -78,10 +80,12 @@ object BlockPosUtil {
     }
 
     fun zFromLong(packedPos: Long): Int {
-        return (packedPos shl 64 - NUM_Z_BITS shr 64 - NUM_Z_BITS).toInt()
+        return (packedPos shl (64 - NUM_Z_BITS) shr (64 - NUM_Z_BITS)).toInt()
     }
 
     fun toLong(x: Int, y: Int, z: Int): Long {
-        return x.toLong() and X_MASK shl X_SHIFT or (y.toLong() and Y_MASK shl Y_SHIFT) or (z.toLong() and Z_MASK shl 0)
+        return (x.toLong() and X_MASK shl X_SHIFT) or
+            (y.toLong() and Y_MASK shl Y_SHIFT) or
+            (z.toLong() and Z_MASK shl Z_SHIFT)
     }
 }
