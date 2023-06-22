@@ -4,7 +4,6 @@ import dev.fastmc.common.collection.MutableIntIterator
 import it.unimi.dsi.fastutil.ints.IntCollection
 import kotlin.math.min
 
-@Suppress("NOTHING_TO_INLINE")
 class StaticBitSet : MutableSet<Int> {
     val bitArray: LongArray
 
@@ -98,7 +97,7 @@ class StaticBitSet : MutableSet<Int> {
         }
     }
 
-    private inline fun toLongArrayVariableSize(elements: Collection<Int>): LongArray {
+    private fun toLongArrayVariableSize(elements: Collection<Int>): LongArray {
         var longArray = LongArray(0)
         for (element in elements) {
             val index = element shr 6
@@ -113,7 +112,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArrayVariableSize(elements: IntCollection): LongArray {
+    private fun toLongArrayVariableSize(elements: IntCollection): LongArray {
         var longArray = LongArray(0)
         val iterator = elements.iterator()
         while (iterator.hasNext()) {
@@ -130,7 +129,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArrayVariableSize(elements: Array<Int>): LongArray {
+    private fun toLongArrayVariableSize(elements: Array<Int>): LongArray {
         var longArray = LongArray(0)
         for (i in elements.indices) {
             val element = elements[i]
@@ -146,7 +145,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArrayVariableSize(elements: IntArray): LongArray {
+    private fun toLongArrayVariableSize(elements: IntArray): LongArray {
         var longArray = LongArray(0)
         for (i in elements.indices) {
             val element = elements[i]
@@ -220,7 +219,7 @@ class StaticBitSet : MutableSet<Int> {
         return modified
     }
 
-    private inline fun toLongArray(elements: Collection<Int>): LongArray {
+    private fun toLongArray(elements: Collection<Int>): LongArray {
         val longArray = LongArray(bitArray.size)
         for (element in elements) {
             val index = element shr 6
@@ -233,7 +232,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArray(elements: IntCollection): LongArray {
+    private fun toLongArray(elements: IntCollection): LongArray {
         val longArray = LongArray(bitArray.size)
         val iterator = elements.iterator()
         while (iterator.hasNext()) {
@@ -248,7 +247,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArray(elements: Array<Int>): LongArray {
+    private fun toLongArray(elements: Array<Int>): LongArray {
         val longArray = LongArray(bitArray.size)
         for (i in elements.indices) {
             val element = elements[i]
@@ -262,7 +261,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArray(elements: IntArray): LongArray {
+    private fun toLongArray(elements: IntArray): LongArray {
         val longArray = LongArray(bitArray.size)
         for (i in elements.indices) {
             val element = elements[i]
@@ -276,7 +275,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun getMaxSize(longArray: LongArray): Int {
+    private fun getMaxSize(longArray: LongArray): Int {
         for (i in longArray.size - 1 downTo 0) {
             if (longArray[i] != 0L) return i + 1
         }
@@ -337,7 +336,7 @@ class StaticBitSet : MutableSet<Int> {
         return true
     }
 
-    private inline fun toLongArrayNullable(elements: Collection<Int>): LongArray? {
+    private fun toLongArrayNullable(elements: Collection<Int>): LongArray? {
         val longArray = LongArray(bitArray.size)
         for (element in elements) {
             val index = element shr 6
@@ -350,7 +349,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArrayNullable(elements: IntCollection): LongArray? {
+    private fun toLongArrayNullable(elements: IntCollection): LongArray? {
         val longArray = LongArray(bitArray.size)
         val iterator = elements.iterator()
         while (iterator.hasNext()) {
@@ -365,7 +364,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArrayNullable(elements: Array<Int>): LongArray? {
+    private fun toLongArrayNullable(elements: Array<Int>): LongArray? {
         val longArray = LongArray(bitArray.size)
         for (i in elements.indices) {
             val element = elements[i]
@@ -379,7 +378,7 @@ class StaticBitSet : MutableSet<Int> {
         return longArray
     }
 
-    private inline fun toLongArrayNullable(elements: IntArray): LongArray? {
+    private fun toLongArrayNullable(elements: IntArray): LongArray? {
         val longArray = LongArray(bitArray.size)
         for (i in elements.indices) {
             val element = elements[i]
@@ -401,7 +400,7 @@ class StaticBitSet : MutableSet<Int> {
         return true
     }
 
-    private inline fun getBit(index: Int): Long {
+    private fun getBit(index: Int): Long {
         return if (index >= bitArray.size) {
             0L
         } else {
@@ -409,7 +408,7 @@ class StaticBitSet : MutableSet<Int> {
         }
     }
 
-    private inline fun putBit(index: Int, bit: Long) {
+    private fun putBit(index: Int, bit: Long) {
         bitArray[index] = bit
     }
 

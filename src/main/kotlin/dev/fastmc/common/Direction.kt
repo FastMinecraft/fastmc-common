@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package dev.fastmc.common
 
 enum class Direction(val idOpposite: Int, val offsetX: Int, val offsetY: Int, val offsetZ: Int) {
@@ -33,7 +31,7 @@ enum class Direction(val idOpposite: Int, val offsetX: Int, val offsetY: Int, va
         val VALUES = arrayOf(DOWN, UP, NORTH, SOUTH, WEST, EAST)
 
         @JvmStatic
-        inline operator fun get(id: Int): Direction {
+        operator fun get(id: Int): Direction {
             return VALUES[id]
         }
     }

@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.AbstractObjectSet
 import it.unimi.dsi.fastutil.objects.ObjectIterator
 import it.unimi.dsi.fastutil.objects.ObjectSet
 
-@Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
+@Suppress("UNCHECKED_CAST")
 class FastIntMap<V : Any> : AbstractInt2ObjectMap<V>() {
     private var array = emptyArray<Any?>()
 
@@ -96,7 +96,7 @@ class FastIntMap<V : Any> : AbstractInt2ObjectMap<V>() {
         }
     }
 
-    inline operator fun set(key: Int, value: V) {
+    operator fun set(key: Int, value: V) {
         put(key, value)
     }
 

@@ -82,13 +82,13 @@ class ArrayPriorityObjectPool<K : Cancellable, E>(
     private inner class QueueEntry(val value: K, val continuation: Continuation<E>)
 }
 
-abstract class AbstractPriorityObjectPool<K : Cancellable, E>(protected val comparator: Comparator<K>?) {
+abstract class AbstractPriorityObjectPool<K : Cancellable, E>(private val comparator: Comparator<K>?) {
     abstract suspend fun get(key: K): E
 
     abstract fun put(element: E)
 
-    @Suppress("UNCHECKED_CAST", "NOTHING_TO_INLINE")
-    protected inline fun compare(o1: K, o2: K): Int {
+    @Suppress("UNCHECKED_CAST")
+    protected fun compare(o1: K, o2: K): Int {
         return comparator?.compare(o1, o2) ?: (o1 as Comparable<K>).compareTo(o2)
     }
 }

@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package dev.fastmc.common.collection
 
 import it.unimi.dsi.fastutil.ints.Int2ByteMap
@@ -12,14 +10,14 @@ inline fun <T, reified R> Array<T>.mapArray(transform: (T) -> R): Array<R> {
     }
 }
 
-inline operator fun Int2ByteMap.set(key: Int, value: Byte) {
+operator fun Int2ByteMap.set(key: Int, value: Byte) {
     this.put(key, value)
 }
 
-inline operator fun <T> Int2ObjectMap<T>.set(key: Int, value: T) {
+operator fun <T> Int2ObjectMap<T>.set(key: Int, value: T) {
     this.put(key, value)
 }
 
-inline operator fun Long2ByteMap.set(key: Long, value: Byte) {
+operator fun Long2ByteMap.set(key: Long, value: Byte) {
     this.put(key, value)
 }

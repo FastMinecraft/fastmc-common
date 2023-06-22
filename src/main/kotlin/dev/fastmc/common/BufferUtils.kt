@@ -1,4 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
 @file:JvmName("BufferUtils")
 
 package dev.fastmc.common
@@ -7,15 +6,15 @@ import sun.misc.Unsafe
 import java.nio.*
 import java.util.function.Consumer
 
-inline fun allocateByte(capacity: Int): ByteBuffer = ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder())
+fun allocateByte(capacity: Int): ByteBuffer = ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder())
 
-inline fun allocateShort(capacity: Int): ShortBuffer = allocateByte(capacity * 4).asShortBuffer()
+fun allocateShort(capacity: Int): ShortBuffer = allocateByte(capacity * 4).asShortBuffer()
 
-inline fun allocateInt(capacity: Int): IntBuffer = allocateByte(capacity * 4).asIntBuffer()
+fun allocateInt(capacity: Int): IntBuffer = allocateByte(capacity * 4).asIntBuffer()
 
-inline fun allocateFloat(capacity: Int): FloatBuffer = allocateByte(capacity * 4).asFloatBuffer()
+fun allocateFloat(capacity: Int): FloatBuffer = allocateByte(capacity * 4).asFloatBuffer()
 
-inline fun <T : Buffer> T.skip(count: Int): Buffer {
+fun <T : Buffer> T.skip(count: Int): Buffer {
     this.position(position() + count)
     return this
 }
