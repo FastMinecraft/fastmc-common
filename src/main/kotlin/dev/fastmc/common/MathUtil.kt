@@ -2,11 +2,9 @@
 
 package dev.fastmc.common
 
-import kotlin.math.PI
-import kotlin.math.ceil
-import kotlin.math.floor
+import kotlin.math.*
 
-object MathUtils {
+object MathUtil {
     @JvmStatic
     fun ceilToPOT(valueIn: Int): Int {
         var i = valueIn
@@ -67,11 +65,13 @@ fun Double.ceilToInt(): Int {
 }
 
 fun Float.floorToInt(): Int {
-    return (this - (toRawBits() ushr 63)).toInt()
+    val offset = -(this - 1.0f).toInt()
+    return (this + offset).toInt() - offset
 }
 
 fun Float.ceilToInt(): Int {
-    return (-this + (toRawBits() ushr 63)).toInt()
+    val offset = (this + 1.0f).toInt()
+    return offset - (offset - this).toInt()
 }
 
 fun Float.toRadians() = this / 180.0f * PI_FLOAT
