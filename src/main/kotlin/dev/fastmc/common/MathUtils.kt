@@ -1,3 +1,5 @@
+@file:Suppress("FloatingPointLiteralPrecision")
+
 package dev.fastmc.common
 
 import kotlin.math.PI
@@ -56,23 +58,21 @@ object MathUtils {
 
 const val PI_FLOAT = 3.14159265358979323846f
 
-const val FLOOR_DOUBLE_D = 1_073_741_824.0
-const val FLOOR_DOUBLE_I = 1_073_741_824
+fun Double.floorToInt(): Int {
+    return floor(this).toInt()
+}
 
-const val FLOOR_FLOAT_F = 4_194_304.0f
-const val FLOOR_FLOAT_I = 4_194_304
+fun Double.ceilToInt(): Int {
+    return ceil(this).toInt()
+}
 
-fun Double.floorToInt() = floor(this).toInt()
-fun Float.floorToInt() = floor(this).toInt()
+fun Float.floorToInt(): Int {
+    return (this - (toRawBits() ushr 63)).toInt()
+}
 
-fun Double.ceilToInt() = ceil(this).toInt()
-fun Float.ceilToInt() = ceil(this).toInt()
-
-fun Double.fastFloor() = (this + FLOOR_DOUBLE_D).toInt() - FLOOR_DOUBLE_I
-fun Float.fastFloor() = (this + FLOOR_FLOAT_F).toInt() - FLOOR_FLOAT_I
-
-fun Double.fastCeil() = FLOOR_DOUBLE_I - (FLOOR_DOUBLE_D - this).toInt()
-fun Float.fastCeil() = FLOOR_FLOAT_I - (FLOOR_FLOAT_F - this).toInt()
+fun Float.ceilToInt(): Int {
+    return (-this + (toRawBits() ushr 63)).toInt()
+}
 
 fun Float.toRadians() = this / 180.0f * PI_FLOAT
 fun Double.toRadians() = this / 180.0 * PI
